@@ -19,6 +19,5 @@ Route::middleware('auth:api')->group(function () {
 
     //Transaction Route
     Route::get('transactions', [TransactionController::class, 'index']);
-    Route::post('transactions/buy', [TransactionController::class, 'store']);
-    Route::post('transactions/sell', [TransactionController::class, 'store']);
+    Route::post('transactions', [TransactionController::class, 'store']);
 });

@@ -29,8 +29,11 @@ class TransactionController extends Controller
 
         $product = Product::find($request->product_id);
 
-        // Check and update inventory based on transaction type
-        if ($request->type == 'sale') {
+        // Handling Purchase Transactions
+        if ($request->type == 'purchase') {
+            // Update product's average price and inventory
+            $product->updateAveragePrice($request->quantity, $request->price_per_unit);
+        } elseif ($request->type == 'sale') {
             // Check if there's enough inventory for the sale
             if ($product->inventory < $request->quantity) {
                 return response()->json(['error' => 'Not enough inventory for sale.'], 400);
@@ -38,13 +41,8 @@ class TransactionController extends Controller
 
             // Decrease product inventory
             $product->inventory -= $request->quantity;
-        } elseif ($request->type == 'purchase') {
-            // Increase product inventory
-            $product->inventory += $request->quantity;
+            $product->save();
         }
-
-        // Save the product with updated inventory
-        $product->save();
 
         // Create the transaction
         $transaction = Transaction::create([
