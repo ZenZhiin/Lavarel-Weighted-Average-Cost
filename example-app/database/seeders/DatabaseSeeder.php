@@ -20,18 +20,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-
-        Product::create([
-            'name' => 'Sample Product 1',
-            'description' => 'This is a sample product',
-            'price' => 100.00,
-        ]);
-        
-        Product::create([
-            'name' => 'Sample Product 2',
-            'description' => 'This is another sample product',
-            'price' => 200.00,
-        ]);
     }
 
 }

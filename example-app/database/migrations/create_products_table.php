@@ -13,6 +13,7 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2); // Default price
+            $table->integer('qty')->default(0); // Add qty column
             $table->timestamps();
         });
     }
