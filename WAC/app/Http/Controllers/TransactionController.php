@@ -84,14 +84,28 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|integer',
             'type' => 'required|in:purchase,sale',
             'transaction_date' => 'required|date',
             'quantity' => 'required|integer|min:1',
             'price_per_unit' => 'required|numeric|min:0',
         ]);
 
-        $product = Product::find($request->product_id);
+        // Check if the product ID is 0, indicating a new product should be created
+        if ($request->input('product_id') == 0) {
+            // Create a new product
+            $product = Product::create([
+                'name' => 'New Product', // You might want to adjust the name generation logic
+                'price' => $request->input('price'), // Set the price if it's a purchase
+            ]);
+        } else {
+            // Find the product by ID
+            $product = Product::find($request->input('product_id'));
+
+            if (!$product) {
+                return response()->json(['message' => 'Product not found.'], 404);
+            }
+        }
 
         // Handling Purchase Transactions
         if ($request->type == 'purchase') {
