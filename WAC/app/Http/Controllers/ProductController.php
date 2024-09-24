@@ -5,9 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Info(
+ *     title="Purchase and Sales Transaction API",
+ *     version="1.0.0",
+ *     description="API for managing products and transactions"
+ * )
+ * @OA\PathItem(path="/api")
+ */
 class ProductController extends Controller
 {
     // Display a listing of the products
+    /**
+     * @OA\Get(
+     *     path="/api/products",
+     *     summary="Get list of products",
+     *     tags={"Products"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Product")
+     *         )
+     *     )
+     * )
+     */
     public function index()
     {
         $products = Product::all();
@@ -15,6 +39,23 @@ class ProductController extends Controller
     }
 
     // Store a newly created product in storage
+    /**
+     * @OA\Post(
+     *     path="/api/products",
+     *     summary="Create a new product",
+     *     tags={"Products"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Product created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         $request->validate([

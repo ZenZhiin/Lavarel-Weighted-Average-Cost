@@ -20,4 +20,5 @@ Route::middleware('auth:api')->group(function () {
     //Transaction Route
     Route::get('transactions', [TransactionController::class, 'index']);
     Route::post('transactions', [TransactionController::class, 'store']);
+    Route::get('transactions/product/{product_id}', [TransactionController::class, 'getTransactionsByProductId']);
 });
