@@ -20,5 +20,7 @@ Route::middleware('auth:api')->group(function () {
     //Transaction Route
     Route::get('transactions', [TransactionController::class, 'index']);
     Route::post('transactions', [TransactionController::class, 'store']);
+    Route::put('/transactions/{id}', [TransactionController::class, 'update']);
+    Route::delete('/transactions/{id}', [TransactionController::class, 'destroy']);
     Route::get('transactions/product/{product_id}', [TransactionController::class, 'getTransactionsByProductId']);
 });

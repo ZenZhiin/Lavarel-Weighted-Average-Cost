@@ -43,7 +43,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::with('product')->where('user_id', Auth::id())->get();
+        $transactions = Transaction::orderBy('date', 'asc')->get();
         return response()->json($transactions);
     }
 
@@ -162,12 +162,104 @@ class TransactionController extends Controller
      */
     public function getTransactionsByProductId($product_id)
     {
-        $transactions = Transaction::where('product_id', $product_id)->get();
+        $transactions = Transaction::where('product_id', $product_id)->orderBy('date', 'asc')->get();
 
         if ($transactions->isEmpty()) {
             return response()->json(['message' => 'No transactions found for this product'], 404);
         }
 
         return response()->json($transactions, 200);
+    }
+
+    /**
+     * Update the specified transaction.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric|min:1',
+            'price' => 'required|numeric|min:0',
+            'date' => 'required|date',
+            'type' => 'required|in:purchase,sale',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Find the transaction by ID
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            return response()->json(['message' => 'Transaction not found.'], 404);
+        }
+
+        // Check if a transaction already exists for the given date (except for the current transaction)
+        $existingTransaction = Transaction::where('date', $request->date)
+            ->where('id', '!=', $id)
+            ->first();
+        if ($existingTransaction) {
+            return response()->json(['message' => 'A transaction already exists for the given date.'], 400);
+        }
+
+        // Update the transaction with the validated data
+        $transaction->product_id = $request->product_id;
+        $transaction->quantity = $request->quantity;
+        $transaction->price = $request->price;
+        $transaction->date = $request->date;
+        $transaction->type = $request->type;
+        $transaction->save();
+
+        // Update the product's price and quantity based on the transaction type
+        $product = Product::find($transaction->product_id);
+        if ($transaction->type === 'purchase') {
+            // Update product price to new average price
+            $totalQuantity = $product->quantity + $transaction->quantity;
+            $totalCost = ($product->price * $product->quantity) + ($transaction->price * $transaction->quantity);
+            $product->price = $totalCost / $totalQuantity;
+            $product->quantity += $transaction->quantity;
+        } else if ($transaction->type === 'sale') {
+            // Decrease the product quantity
+            $product->quantity -= $transaction->quantity;
+        }
+        $product->save();
+
+        return response()->json(['message' => 'Transaction updated successfully.']);
+    }
+
+     /**
+     * Remove the specified transaction.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
+    {
+        // Find the transaction by ID
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            return response()->json(['message' => 'Transaction not found.'], 404);
+        }
+
+        // Update the product's quantity based on the transaction type before deletion
+        $product = Product::find($transaction->product_id);
+        if ($transaction->type === 'purchase') {
+            // Reduce the quantity and adjust price if necessary
+            $product->quantity -= $transaction->quantity;
+        } else if ($transaction->type === 'sale') {
+            // Increase the quantity back
+            $product->quantity += $transaction->quantity;
+        }
+        $product->save();
+
+        // Delete the transaction
+        $transaction->delete();
+
+        return response()->json(['message' => 'Transaction deleted successfully.']);
     }
 }
