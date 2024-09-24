@@ -4,6 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @OA\Schema(
+ *     schema="Product",
+ *     type="object",
+ *     title="Product",
+ *     description="Product Model",
+ *     properties={
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Product A"),
+ *         @OA\Property(property="description", type="string", example="Description of Product A"),
+ *         @OA\Property(property="price", type="number", format="float", example=100.00),
+ *         @OA\Property(property="inventory", type="integer", example=20)
+ *     }
+ * )
+ */
 class Product extends Model
 {
     protected $fillable = ['name', 'description', 'qty', 'price'];
