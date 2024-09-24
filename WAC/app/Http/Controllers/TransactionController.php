@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Auth;
  */
 class TransactionController extends Controller
 {
-    // Display a listing of the transactions
     /**
      * @OA\Get(
      *     path="/api/transactions",
@@ -107,22 +106,17 @@ class TransactionController extends Controller
             }
         }
 
-        // Handling Purchase Transactions
         if ($request->type == 'purchase') {
-            // Update product's average price and inventory
             $product->updateAveragePrice($request->quantity, $request->price_per_unit);
         } elseif ($request->type == 'sale') {
-            // Check if there's enough inventory for the sale
             if ($product->inventory < $request->quantity) {
                 return response()->json(['error' => 'Not enough inventory for sale.'], 400);
             }
 
-            // Decrease product inventory
             $product->inventory -= $request->quantity;
             $product->save();
         }
 
-        // Create the transaction
         $transaction = Transaction::create([
             'user_id' => Auth::id(),
             'product_id' => $request->product_id,
@@ -168,7 +162,6 @@ class TransactionController extends Controller
      */
     public function getTransactionsByProductId($product_id)
     {
-        // Validate that the product exists
         $transactions = Transaction::where('product_id', $product_id)->get();
 
         if ($transactions->isEmpty()) {

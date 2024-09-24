@@ -15,7 +15,6 @@ use Illuminate\Http\Request;
  */
 class ProductController extends Controller
 {
-    // Display a listing of the products
     /**
      * @OA\Get(
      *     path="/api/products",
@@ -38,7 +37,6 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-    // Store a newly created product in storage
     /**
      * @OA\Post(
      *     path="/api/products",
@@ -73,7 +71,23 @@ class ProductController extends Controller
         return response()->json($product, 201);
     }
 
-    // Display the specified product
+    /**
+     * @OA\Get(
+     *     path="/api/products",
+     *     summary="Create a new product",
+     *     tags={"Products"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Product created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     )
+     * )
+     */
     public function show($id)
     {
         $product = Product::find($id);
@@ -85,7 +99,23 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    // Update the specified product in storage
+    /**
+     * @OA\Post(
+     *     path="/api/products",
+     *     summary="Update a new product",
+     *     tags={"Products"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Product created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     )
+     * )
+     */
     public function update(Request $request, $id)
     {
         $product = Product::find($id);
@@ -107,19 +137,5 @@ class ProductController extends Controller
         ]);
 
         return response()->json($product);
-    }
-
-    // Remove the specified product from storage
-    public function destroy($id)
-    {
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json(['error' => 'Product not found'], 404);
-        }
-
-        $product->delete();
-
-        return response()->json(['message' => 'Product deleted successfully']);
     }
 }
