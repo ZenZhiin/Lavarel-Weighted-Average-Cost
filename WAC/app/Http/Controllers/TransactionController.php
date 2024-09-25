@@ -172,7 +172,7 @@ class TransactionController extends Controller
     }
 
     /**
-     * Update the specified transaction.
+     * Update the specified transaction and recalculate average price
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -180,7 +180,6 @@ class TransactionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validate the incoming request data
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|numeric|min:1',
@@ -193,13 +192,11 @@ class TransactionController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // Find the transaction by ID
         $transaction = Transaction::find($id);
         if (!$transaction) {
             return response()->json(['message' => 'Transaction not found.'], 404);
         }
 
-        // Check if a transaction already exists for the given date (except for the current transaction)
         $existingTransaction = Transaction::where('date', $request->date)
             ->where('id', '!=', $id)
             ->first();
@@ -207,7 +204,6 @@ class TransactionController extends Controller
             return response()->json(['message' => 'A transaction already exists for the given date.'], 400);
         }
 
-        // Update the transaction with the validated data
         $transaction->product_id = $request->product_id;
         $transaction->quantity = $request->quantity;
         $transaction->price = $request->price;
@@ -215,16 +211,23 @@ class TransactionController extends Controller
         $transaction->type = $request->type;
         $transaction->save();
 
-        // Update the product's price and quantity based on the transaction type
         $product = Product::find($transaction->product_id);
         if ($transaction->type === 'purchase') {
-            // Update product price to new average price
-            $totalQuantity = $product->quantity + $transaction->quantity;
-            $totalCost = ($product->price * $product->quantity) + ($transaction->price * $transaction->quantity);
+            $purchaseTransactions = Transaction::where('product_id', $product->id)
+                ->where('type', 'purchase')
+                ->get();
+
+            $totalQuantity = $purchaseTransactions->sum('quantity');
+            $totalCost = $purchaseTransactions->sum(function($trans) {
+                return $trans->quantity * $trans->price;
+            });
+
             $product->price = $totalCost / $totalQuantity;
+        }
+
+        if ($transaction->type === 'purchase') {
             $product->quantity += $transaction->quantity;
         } else if ($transaction->type === 'sale') {
-            // Decrease the product quantity
             $product->quantity -= $transaction->quantity;
         }
         $product->save();
@@ -232,34 +235,52 @@ class TransactionController extends Controller
         return response()->json(['message' => 'Transaction updated successfully.']);
     }
 
+
      /**
-     * Remove the specified transaction.
+     * Remove the specified transaction and recalculate the average price
      *
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        // Find the transaction by ID
         $transaction = Transaction::find($id);
         if (!$transaction) {
             return response()->json(['message' => 'Transaction not found.'], 404);
         }
-
-        // Update the product's quantity based on the transaction type before deletion
+    
         $product = Product::find($transaction->product_id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found.'], 404);
+        }
+    
         if ($transaction->type === 'purchase') {
-            // Reduce the quantity and adjust price if necessary
             $product->quantity -= $transaction->quantity;
+            
+            $purchaseTransactions = Transaction::where('product_id', $product->id)
+                ->where('type', 'purchase')
+                ->where('id', '!=', $transaction->id) 
+                ->get();
+    
+            if ($purchaseTransactions->count() > 0) {
+                $totalQuantity = $purchaseTransactions->sum('quantity');
+                $totalCost = $purchaseTransactions->sum(function($trans) {
+                    return $trans->quantity * $trans->price;
+                });
+    
+                $product->price = $totalCost / $totalQuantity;
+            } else {
+                $product->price = 0;
+            }
         } else if ($transaction->type === 'sale') {
-            // Increase the quantity back
             $product->quantity += $transaction->quantity;
         }
+    
         $product->save();
-
-        // Delete the transaction
+    
         $transaction->delete();
-
+    
         return response()->json(['message' => 'Transaction deleted successfully.']);
     }
+    
 }
