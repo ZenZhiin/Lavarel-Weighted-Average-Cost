@@ -46,7 +46,7 @@ The Purchase and Sales Transaction API is a Laravel-based RESTful service design
 
     ```bash
     git clone https://github.com/your-username/your-repo-name.git
-    cd your-repo-name
+    cd your-repo-name/WAC
     ```
 
 2. **Install dependencies:**
@@ -63,19 +63,33 @@ The Purchase and Sales Transaction API is a Laravel-based RESTful service design
     cp .env.example .env
     ```
 
-4. **Generate the application key:**
+4. **Configure environment variables in .env file:**
+    Set up your database connection.
+    Add the following Swagger-related variables:
+    ```bash
+    L5_SWAGGER_GENERATE_ALWAYS=true
+    L5_SWAGGER_CONST_HOST=http://your-app-url
+    ```
+
+5. **Generate Swagger API documentation:**
+
+    ```bash
+    php artisan l5-swagger:generate
+    ```
+
+6. **Generate the application key:**
 
     ```bash
     php artisan key:generate
     ```
 
-5. **Run database migrations and seeders:**
+7. **Run database migrations and seeders:**
 
     ```bash
     php artisan migrate --seed
     ```
 
-6. **Install and publish JWT Authentication:**
+8. **Install and publish JWT Authentication:**
 
     ```bash
     composer require tymon/jwt-auth
@@ -83,12 +97,17 @@ The Purchase and Sales Transaction API is a Laravel-based RESTful service design
     php artisan jwt:secret
     ```
 
-7. **Start the application:**
+9. **Start the application:**
 
     ```bash
     php artisan serve
     ```
 
+10. **Access the Swagger documentation at:**
+
+    ```bash
+    http://your-app-url/api/documentation
+    ```
 ### Configuration
 
 Update the following environment variables in the `.env` file as needed:
