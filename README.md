@@ -88,7 +88,7 @@ The Purchase and Sales Transaction API is a Laravel-based RESTful service design
     ```bash
     php artisan serve
     ```
-    
+
 ### Configuration
 
 Update the following environment variables in the `.env` file as needed:
@@ -128,6 +128,7 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   "email": "user@test.com",
   "password": "password"
 }
+```
 
 ### Login
 
@@ -139,6 +140,7 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   "email": "john@example.com",
   "password": "yourpassword"
 }
+```
 
 **Response Body:**
 ```json
@@ -147,6 +149,7 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   "token_type": "bearer",
   "expires_in": 3600
 }
+```
 
 ### Products
 
@@ -163,6 +166,7 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   },
   ...
 ]
+```
 
 ### Transactions
 
@@ -177,6 +181,7 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   "date": "2024-09-25",
   "type": "purchase"
 }
+```
 
 **Request Body (for sales):** 
 ```json
@@ -187,18 +192,21 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   "date": "2024-09-26",
   "type": "sale"
 }
+```
 
 **Response Body:**
 ```json
 {
   "message": "Transaction created successfully."
 }
+```
 
 ### List transactions
 
 **Endpoint:** `GET /api/transactions`
 
 **Response Body:** 
+```json
 [
   {
     "product_id": 1,
@@ -213,12 +221,14 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   },
   ...
 ]
+```
 
 ### Update a transaction
 
 **Endpoint:** `PUT /api/transactions/{id}`
 
 **Request Body:** 
+```json
 {
   "product_id": 1,
   "quantity": 8,
@@ -226,17 +236,21 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   "date": "2024-09-25",
   "type": "purchase"
 }
-
+```
 **Response Body:** 
+```json
 {
   "message": "Transaction updated successfully."
 }
+```
 
 ### Delete a transaction 
 
 **Endpoint:** `DELETE /api/transactions/{id}`
 
 **Response Body:** 
+```json
 {
   "message": "Transaction updated successfully."
 }
+```
