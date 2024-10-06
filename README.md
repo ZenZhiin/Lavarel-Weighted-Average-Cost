@@ -114,3 +114,115 @@ This API uses JWT-based authentication. You need to obtain a token by registerin
   "email": "user@test.com",
   "password": "password"
 }
+
+### Login
+
+**Endpoint:** `POST /api/login`
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
+  "password": "yourpassword"
+}
+
+**Response Body:**
+```json
+{
+  "access_token": "your-jwt-token",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+
+### Products
+
+**Endpoint:** `GET /api/products`
+
+**Response Body:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Product A",
+    "price": 10.00,
+    "quantity": 50
+  },
+  ...
+]
+
+### Transactions
+
+**Endpoint:** `POST /api/transactions`
+
+**Request Body (for purchase):** 
+```json
+{
+  "product_id": 1,
+  "quantity": 10,
+  "price": 12.50,
+  "date": "2024-09-25",
+  "type": "purchase"
+}
+
+**Request Body (for sales):** 
+```json
+{
+  "product_id": 1,
+  "quantity": 5,
+  "price": 15.00,
+  "date": "2024-09-26",
+  "type": "sale"
+}
+
+**Response Body:**
+```json
+{
+  "message": "Transaction created successfully."
+}
+
+### List transactions
+
+**Endpoint:** `GET /api/transactions`
+
+**Response Body:** 
+[
+  {
+    "product_id": 1,
+    "total_quantity": 30,
+    "average_price": 11.25,
+    "last_transaction_date": "2024-09-26",
+    "product": {
+      "id": 1,
+      "name": "Product A",
+      "price": 11.25
+    }
+  },
+  ...
+]
+
+### Update a transaction
+
+**Endpoint:** `PUT /api/transactions/{id}`
+
+**Request Body:** 
+{
+  "product_id": 1,
+  "quantity": 8,
+  "price": 13.00,
+  "date": "2024-09-25",
+  "type": "purchase"
+}
+
+**Response Body:** 
+{
+  "message": "Transaction updated successfully."
+}
+
+### Delete a transaction 
+
+**Endpoint:** `DELETE /api/transactions/{id}`
+
+**Response Body:** 
+{
+  "message": "Transaction updated successfully."
+}
