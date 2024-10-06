@@ -75,7 +75,7 @@ The Purchase and Sales Transaction API is a Laravel-based RESTful service design
     php artisan migrate --seed
     ```
 
-6. **Install and publish JWT Authentication:
+6. **Install and publish JWT Authentication:**
 
     ```bash
     composer require tymon/jwt-auth
@@ -83,7 +83,7 @@ The Purchase and Sales Transaction API is a Laravel-based RESTful service design
     php artisan jwt:secret
     ```
 
-7. **Start the application:
+7. **Start the application:**
 
     ```bash
     php artisan serve
