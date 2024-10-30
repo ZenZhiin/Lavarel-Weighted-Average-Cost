@@ -78,13 +78,16 @@ class ProductController extends Controller
      *     tags={"Products"},
      *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *         required=false
      *     ),
      *     @OA\Response(
      *         response=201,
      *         description="Product created successfully",
      *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found"
      *     )
      * )
      */
